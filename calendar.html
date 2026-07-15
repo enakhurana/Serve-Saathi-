@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Serve Saathi — Calendar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Karla:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ivory:#F7F2E6; --sand:#EADFC8; --teal:#17403C; --teal-deep:#0E2926; --teal-tint:#E4ECE7;
+    --marigold:#E2A13B; --marigold-dim:#C98A2A; --marigold-tint:#FBEFD9;
+    --rose:#C1697A; --rose-tint:#F6E7EA; --ink:#2A231D; --ink-soft:#6B6255; --line:rgba(42,35,29,0.12);
+    --card:#FFFFFF;
+    --font-display:'Newsreader', serif; --font-body:'Karla', sans-serif; --font-mono:'IBM Plex Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--ivory);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  h1,h2,h3{font-family:var(--font-display);font-weight:500;margin:0;color:var(--teal-deep);}
+  a,button{color:inherit;}
+  :focus-visible{outline:2px solid var(--teal);outline-offset:2px;}
+  .eyebrow{font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:500;display:flex;align-items:center;gap:8px;}
+
+  .app{display:flex;min-height:100vh;}
+
+  /* ---------- Sidebar (shared shell) ---------- */
+  .sidebar{width:258px;flex:none;background:var(--teal-deep);color:var(--sand);padding:26px 18px 18px;position:sticky;top:0;height:100vh;overflow-y:auto;}
+  .sb-brand{display:flex;align-items:center;gap:9px;color:var(--ivory);font-family:var(--font-display);font-size:19px;font-weight:600;padding:0 8px;margin-bottom:30px;}
+  .sb-brand svg{width:22px;height:22px;flex:none;}
+  .sb-group{margin-bottom:22px;}
+  .sb-group h4{font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:rgba(234,223,200,0.5);font-weight:500;padding:0 10px;margin:0 0 8px;}
+  .sb-group ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;}
+  .sb-group a{display:flex;align-items:center;justify-content:space-between;font-size:13.5px;padding:9px 10px;border-radius:9px;color:rgba(247,242,230,0.82);text-decoration:none;}
+  .sb-group a:hover{background:rgba(247,242,230,0.06);color:var(--ivory);}
+  .sb-group a.active{background:var(--marigold);color:var(--teal-deep);font-weight:600;}
+  .sb-badge{font-family:var(--font-mono);font-size:10px;background:var(--rose);color:var(--ivory);border-radius:20px;padding:1px 7px;}
+  .sb-group a.active .sb-badge{background:var(--teal-deep);color:var(--ivory);}
+  .sb-foot{margin-top:8px;padding-top:16px;border-top:1px solid rgba(247,242,230,0.14);}
+
+  /* ---------- Main shell ---------- */
+  .main{flex:1;min-width:0;display:flex;flex-direction:column;height:100vh;}
+  .topbar{flex:none;background:rgba(247,242,230,0.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:14px 32px;gap:24px;}
+  .search{flex:1;max-width:380px;position:relative;}
+  .search input{width:100%;border:1px solid var(--line);background:var(--card);border-radius:100px;padding:10px 16px 10px 36px;font-family:var(--font-body);font-size:13.5px;color:var(--ink);}
+  .search input::placeholder{color:var(--ink-soft);}
+  .search::before{content:"⌕";position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--ink-soft);font-size:15px;}
+  .top-actions{display:flex;align-items:center;gap:18px;}
+  .icon-btn{position:relative;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--card);display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;}
+  .icon-btn .dot{position:absolute;top:6px;right:7px;width:7px;height:7px;border-radius:50%;background:var(--rose);border:1.5px solid var(--ivory);}
+  .profile-chip{display:flex;align-items:center;gap:10px;padding:5px 14px 5px 5px;border:1px solid var(--line);border-radius:100px;background:var(--card);}
+  .avatar{width:30px;height:30px;border-radius:50%;background:var(--marigold);color:var(--teal-deep);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:600;font-size:13px;flex:none;}
+  .profile-chip .name{font-size:12.5px;font-weight:600;color:var(--teal-deep);line-height:1.2;}
+  .profile-chip .role{font-size:10.5px;color:var(--ink-soft);}
+
+  /* ---------- Calendar header ---------- */
+  .cal-head{flex:none;padding:22px 32px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
+  .cal-head h1{font-size:24px;}
+  .cal-nav{display:flex;align-items:center;gap:14px;}
+  .cal-nav button{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:var(--card);cursor:pointer;font-size:13px;}
+  .cal-nav .range{font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);}
+  .view-toggle{display:flex;border:1px solid var(--line);border-radius:100px;overflow:hidden;}
+  .view-toggle button{font-family:var(--font-mono);font-size:12px;padding:8px 16px;background:var(--card);border:none;cursor:pointer;color:var(--ink-soft);}
+  .view-toggle button.active{background:var(--teal-deep);color:var(--ivory);}
+  .btn-new{font-family:var(--font-body);font-weight:600;font-size:13.5px;background:var(--marigold);color:var(--teal-deep);border:none;padding:10px 18px;border-radius:100px;cursor:pointer;}
+  .btn-new:hover{background:var(--marigold-dim);}
+
+  /* ---------- Work area ---------- */
+  .work-area{flex:1;display:flex;min-height:0;}
+  .cal-scroll{flex:1;overflow:auto;padding:0 0 30px 32px;}
+
+  .grid{display:grid;grid-template-columns:60px repeat(7,1fr);min-width:820px;}
+  .day-header{position:sticky;top:0;background:var(--ivory);z-index:2;padding:12px 6px;text-align:center;border-bottom:1px solid var(--line);}
+  .day-header .dow{font-family:var(--font-mono);font-size:10.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.05em;}
+  .day-header .dnum{font-family:var(--font-display);font-size:19px;color:var(--teal-deep);font-weight:600;margin-top:2px;}
+  .day-header.today .dnum{color:var(--ivory);background:var(--marigold);width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:2px auto 0;}
+  .corner{border-bottom:1px solid var(--line);}
+
+  .grid-body{display:grid;grid-template-columns:60px repeat(7,1fr);grid-template-rows:repeat(26,32px);position:relative;grid-column:1/-1;}
+  .time-label{grid-column:1;font-family:var(--font-mono);font-size:10px;color:var(--ink-soft);text-align:right;padding-right:10px;transform:translateY(-6px);}
+  .hline{grid-column:2/-1;border-top:1px solid var(--line);}
+  .hline.half{border-top:1px dashed rgba(42,35,29,0.06);}
+  .dcol-bg{border-left:1px solid var(--line);}
+
+  .event{border-radius:8px;padding:5px 8px;margin:1px 4px;font-size:11px;line-height:1.3;overflow:hidden;color:var(--teal-deep);border-left:3px solid;cursor:pointer;}
+  .event .t{font-weight:700;display:block;}
+  .event .m{font-family:var(--font-mono);font-size:9.5px;opacity:.75;}
+  .event.cat-teal{background:var(--teal-tint);border-color:var(--teal);}
+  .event.cat-marigold{background:var(--marigold-tint);border-color:var(--marigold-dim);color:var(--marigold-dim);}
+  .event.cat-rose{background:var(--rose-tint);border-color:var(--rose);color:var(--rose);}
+
+  /* ---------- Right panel ---------- */
+  .panel-col{width:320px;flex:none;background:var(--card);border-left:1px solid var(--line);padding:26px 24px 40px;overflow-y:auto;}
+  .panel-block{margin-bottom:30px;}
+  .panel-block h4{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--marigold-dim);font-weight:500;margin-bottom:14px;}
+  .agenda-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);}
+  .agenda-time{font-family:var(--font-mono);font-size:11px;color:var(--ink-soft);width:52px;flex:none;padding-top:2px;}
+  .agenda-dot{width:8px;height:8px;border-radius:50%;flex:none;margin-top:5px;}
+  .agenda-dot.cat-teal{background:var(--teal);}
+  .agenda-dot.cat-marigold{background:var(--marigold-dim);}
+  .agenda-dot.cat-rose{background:var(--rose);}
+  .agenda-body p{margin:0;font-size:13px;color:var(--teal-deep);font-weight:600;}
+  .agenda-body span{font-size:11.5px;color:var(--ink-soft);}
+
+  .legend-row{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--ink-soft);padding:7px 0;}
+  .legend-swatch{width:10px;height:10px;border-radius:3px;flex:none;}
+  .legend-swatch.cat-teal{background:var(--teal);}
+  .legend-swatch.cat-marigold{background:var(--marigold-dim);}
+  .legend-swatch.cat-rose{background:var(--rose);}
+  .legend-types{font-family:var(--font-mono);font-size:10px;color:var(--ink-soft);margin-left:20px;margin-top:-4px;margin-bottom:6px;}
+
+  @media (max-width:1150px){ .panel-col{display:none;} }
+  @media (max-width:860px){
+    .sidebar{display:none;}
+    .cal-head{padding:16px 18px;}
+    .cal-scroll{padding-left:18px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <svg viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="12" stroke="currentColor" stroke-width="1.3"/><path d="M13 3v6M13 17v6M3 13h6M17 13h6M6 6l4.2 4.2M15.8 15.8L20 20M20 6l-4.2 4.2M10.2 15.8L6 20" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/><circle cx="13" cy="13" r="3.4" fill="currentColor"/></svg>
+      Serve Saathi
+    </div>
+
+    <div class="sb-group">
+      <h4>Overview</h4>
+      <ul><li><a href="serve-saathi-provider-dashboard.html">Dashboard Home</a></li></ul>
+    </div>
+
+    <div class="sb-group">
+      <h4>Leads &amp; Bookings</h4>
+      <ul>
+        <li><a href="serve-saathi-lead-management.html">Lead Management <span class="sb-badge">9</span></a></li>
+        <li><a href="serve-saathi-booking-management.html">Booking Management</a></li>
+        <li><a href="#" class="active">Calendar</a></li>
+      </ul>
+    </div>
+
+    <div class="sb-group">
+      <h4>Catalogue &amp; Facility</h4>
+      <ul>
+        <li><a href="#">Service Catalogue</a></li>
+        <li><a href="#">Facility Management</a></li>
+        <li><a href="#">Staff Management</a></li>
+      </ul>
+    </div>
+
+    <div class="sb-group">
+      <h4>Family &amp; Care</h4>
+      <ul>
+        <li><a href="#">Family Communication</a></li>
+        <li><a href="#">Medical Records</a></li>
+      </ul>
+    </div>
+
+    <div class="sb-group">
+      <h4>Business</h4>
+      <ul>
+        <li><a href="#">Finance</a></li>
+        <li><a href="#">Reviews</a></li>
+        <li><a href="#">Analytics</a></li>
+        <li><a href="#">Marketing</a></li>
+      </ul>
+    </div>
+
+    <div class="sb-group">
+      <h4>Trust &amp; Growth</h4>
+      <ul>
+        <li><a href="#">Compliance <span class="sb-badge">2</span></a></li>
+        <li><a href="#">Partner Success</a></li>
+      </ul>
+    </div>
+
+    <div class="sb-group sb-foot">
+      <ul>
+        <li><a href="#">Notifications <span class="sb-badge">5</span></a></li>
+        <li><a href="#">Profile &amp; Documents</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <div class="search"><input type="text" placeholder="Search appointments, staff, rooms…"></div>
+      <div class="top-actions">
+        <button class="icon-btn" aria-label="Messages">✉<span class="dot"></span></button>
+        <button class="icon-btn" aria-label="Notifications">🔔<span class="dot"></span></button>
+        <div class="profile-chip">
+          <div class="avatar">SM</div>
+          <div>
+            <div class="name">Sunrise Manor</div>
+            <div class="role">Assisted Living · Delhi</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cal-head">
+      <div>
+        <h1>Calendar</h1>
+      </div>
+      <div class="cal-nav">
+        <button aria-label="Previous week">‹</button>
+        <span class="range">13 – 19 July 2026</span>
+        <button aria-label="Next week">›</button>
+      </div>
+      <div class="view-toggle">
+        <button>Day</button>
+        <button class="active">Week</button>
+        <button>Month</button>
+      </div>
+      <button class="btn-new">+ New event</button>
+    </div>
+
+    <div class="work-area">
+      <div class="cal-scroll">
+        <div class="grid">
+          <div class="corner"></div>
+          <div class="day-header"><div class="dow">Mon</div><div class="dnum">13</div></div>
+          <div class="day-header today"><div class="dow">Tue</div><div class="dnum">14</div></div>
+          <div class="day-header"><div class="dow">Wed</div><div class="dnum">15</div></div>
+          <div class="day-header"><div class="dow">Thu</div><div class="dnum">16</div></div>
+          <div class="day-header"><div class="dow">Fri</div><div class="dnum">17</div></div>
+          <div class="day-header"><div class="dow">Sat</div><div class="dnum">18</div></div>
+          <div class="day-header"><div class="dow">Sun</div><div class="dnum">19</div></div>
+        </div>
+
+        <div class="grid-body" id="gridBody"></div>
+      </div>
+
+      <aside class="panel-col">
+        <div class="panel-block">
+          <h4>Today — Tue 14 Jul</h4>
+          <div id="agenda"></div>
+        </div>
+        <div class="panel-block">
+          <h4>Event types</h4>
+          <div class="legend-row"><span class="legend-swatch cat-teal"></span>Clinical care</div>
+          <div class="legend-types">Appointments · Doctor visits · Medication</div>
+          <div class="legend-row"><span class="legend-swatch cat-marigold"></span>Admin &amp; facility</div>
+          <div class="legend-types">Admissions · Discharges · Events</div>
+          <div class="legend-row"><span class="legend-swatch cat-rose"></span>Staff &amp; operations</div>
+          <div class="legend-types">Maintenance · Staff leave</div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<script>
+// day: 1=Mon ... 7=Sun. row = (hour-7)*2 + 1 + (min===30?1:0)
+function row(hour,min){ return (hour-7)*2 + 1 + (min===30?1:0); }
+
+const events = [
+  { day:1, type:"Discharge", who:"Mr. Bansal — Room 8", cat:"marigold", startRow:row(9,0), endRow:row(9,30) },
+  { day:1, type:"Admission", who:"Deepa Nair — paperwork review", cat:"marigold", startRow:row(10,0), endRow:row(11,0) },
+  { day:1, type:"Maintenance", who:"AC servicing — Room 12", cat:"rose", startRow:row(14,0), endRow:row(15,0) },
+
+  { day:2, type:"Medication", who:"Morning medication round", cat:"teal", startRow:row(8,0), endRow:row(8,30) },
+  { day:2, type:"Doctor visit", who:"Dr. Anand — weekly rounds", cat:"teal", startRow:row(11,0), endRow:row(12,0) },
+  { day:2, type:"Appointment", who:"Video call — Susan George (family)", cat:"teal", startRow:row(19,0), endRow:row(19,30) },
+
+  { day:3, type:"Appointment", who:"Physiotherapy — Fatima Sheikh", cat:"teal", startRow:row(18,0), endRow:row(19,0) },
+
+  { day:4, type:"Medication", who:"Morning medication round", cat:"teal", startRow:row(8,0), endRow:row(8,30) },
+  { day:4, type:"Appointment", who:"Facility visit — Manoj Iyer", cat:"marigold", startRow:row(16,0), endRow:row(17,0) },
+
+  { day:5, type:"Staff leave", who:"Amit Kulkarni — full day", cat:"rose", startRow:row(9,0), endRow:row(18,0) },
+  { day:5, type:"Appointment", who:"Assisted living tour — Neha Kapoor", cat:"marigold", startRow:row(17,0), endRow:row(18,0) },
+
+  { day:6, type:"Appointment", who:"Facility visit — Vikram Rao", cat:"marigold", startRow:row(11,0), endRow:row(12,0) },
+  { day:6, type:"Appointment", who:"Physiotherapy — Fatima Sheikh", cat:"teal", startRow:row(18,0), endRow:row(19,0) },
+
+  { day:7, type:"Medication", who:"Morning medication round", cat:"teal", startRow:row(8,0), endRow:row(8,30) },
+  { day:7, type:"Event", who:"Weekend family visiting hours", cat:"marigold", startRow:row(15,0), endRow:row(17,0) },
+];
+
+function renderGrid(){
+  const body = document.getElementById('gridBody');
+  let html = '';
+
+  // time labels + hour lines
+  for(let h=7; h<=19; h++){
+    const r1 = row(h,0);
+    html += `<div class="time-label" style="grid-row:${r1};">${h<=12?h:h-12}${h<12?'am':'pm'}</div>`;
+    html += `<div class="hline" style="grid-row:${r1};grid-column:2/-1;"></div>`;
+    html += `<div class="hline half" style="grid-row:${r1+1};grid-column:2/-1;"></div>`;
+  }
+
+  // day column backgrounds
+  for(let d=1; d<=7; d++){
+    html += `<div class="dcol-bg" style="grid-column:${d+1};grid-row:1/27;"></div>`;
+  }
+
+  // events
+  events.forEach(e=>{
+    html += `<div class="event cat-${e.cat}" style="grid-column:${e.day+1};grid-row:${e.startRow}/${e.endRow};">
+      <span class="t">${e.type}</span><span class="m">${e.who}</span>
+    </div>`;
+  });
+
+  body.innerHTML = html;
+}
+
+function renderAgenda(){
+  const todays = events.filter(e=>e.day===2).sort((a,b)=>a.startRow-b.startRow);
+  const agenda = document.getElementById('agenda');
+  agenda.innerHTML = todays.map(e=>{
+    const totalMin = (e.startRow-1)*30 + 7*60;
+    const h = Math.floor(totalMin/60), m = totalMin%60;
+    const label = `${h<=12?h:h-12}:${m===0?'00':m} ${h<12?'AM':'PM'}`;
+    return `
+      <div class="agenda-item">
+        <div class="agenda-time">${label}</div>
+        <span class="agenda-dot cat-${e.cat}"></span>
+        <div class="agenda-body"><p>${e.type}</p><span>${e.who}</span></div>
+      </div>
+    `;
+  }).join('');
+}
+
+renderGrid();
+renderAgenda();
+</script>
+
+</body>
+</html>
