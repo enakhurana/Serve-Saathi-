@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Serve Saathi — Your family's companion in ageing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Karla:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ivory:#F7F2E6;
+    --sand:#EADFC8;
+    --teal:#17403C;
+    --teal-deep:#0E2926;
+    --teal-tint:#E4ECE7;
+    --marigold:#E2A13B;
+    --marigold-dim:#C98A2A;
+    --rose:#C1697A;
+    --ink:#2A231D;
+    --ink-soft:#6B6255;
+    --line:rgba(42,35,29,0.12);
+    --font-display:'Newsreader', serif;
+    --font-body:'Karla', sans-serif;
+    --font-mono:'IBM Plex Mono', monospace;
+    --max:1180px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--ivory);
+    color:var(--ink);
+    font-family:var(--font-body);
+    font-size:17px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  img,svg{display:block;max-width:100%;}
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 32px;}
+  h1,h2,h3{font-family:var(--font-display);font-weight:500;margin:0;color:var(--teal-deep);}
+  .eyebrow{
+    font-family:var(--font-mono);
+    font-size:12px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--marigold-dim);
+    font-weight:500;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:22px;height:1px;
+    background:var(--marigold-dim);
+    display:inline-block;
+  }
+  :focus-visible{outline:2px solid var(--teal);outline-offset:3px;}
+
+  /* ---------- Nav ---------- */
+  .nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(247,242,230,0.88);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav .wrap{display:flex;align-items:center;justify-content:space-between;padding-top:16px;padding-bottom:16px;}
+  .brand{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-size:20px;font-weight:600;color:var(--teal-deep);}
+  .brand svg{width:26px;height:26px;}
+  .nav-links{display:flex;gap:32px;align-items:center;}
+  .nav-links a{font-size:14.5px;font-weight:500;color:var(--ink);}
+  .nav-links a:hover{color:var(--teal);}
+  .nav-cta{display:flex;align-items:center;}
+  .nav-mobile-toggle{display:none;background:none;border:none;cursor:pointer;padding:6px;}
+  .nav-mobile-toggle span{display:block;width:22px;height:2px;background:var(--ink);margin:5px 0;}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    font-family:var(--font-body);font-weight:600;font-size:14.5px;
+    padding:13px 24px;border-radius:100px;
+    border:1px solid transparent;cursor:pointer;
+    transition:transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
+    white-space:nowrap;
+  }
+  .btn-primary{background:var(--marigold);color:var(--teal-deep);}
+  .btn-primary:hover{background:var(--marigold-dim);transform:translateY(-1px);box-shadow:0 6px 18px rgba(226,161,59,0.35);}
+  .btn-ghost{border-color:var(--teal);color:var(--teal-deep);background:transparent;}
+  .btn-ghost:hover{background:var(--teal);color:var(--ivory);}
+  .btn-on-dark{border-color:rgba(247,242,230,0.4);color:var(--ivory);}
+  .btn-on-dark:hover{background:var(--ivory);color:var(--teal-deep);}
+  .btn-sm{padding:10px 18px;font-size:13.5px;}
+
+  /* ---------- Hero ---------- */
+  .hero{padding:88px 0 96px;position:relative;overflow:hidden;}
+  .hero .wrap{display:grid;grid-template-columns:1.05fr 0.95fr;gap:56px;align-items:center;}
+  .hero h1{font-size:clamp(34px,4.4vw,56px);line-height:1.12;letter-spacing:-0.01em;}
+  .hero h1 em{font-style:italic;color:var(--marigold-dim);}
+  .hero-sub{margin:24px 0 34px;font-size:18px;color:var(--ink-soft);max-width:46ch;}
+  .hero-ctas{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:36px;}
+  .hero-meta{display:flex;gap:28px;flex-wrap:wrap;}
+  .hero-meta div{font-family:var(--font-mono);font-size:12px;color:var(--ink-soft);letter-spacing:0.03em;}
+  .hero-meta strong{display:block;font-family:var(--font-display);font-size:22px;color:var(--teal-deep);font-weight:600;}
+
+  .dial-wrap{position:relative;display:flex;flex-direction:column;align-items:center;}
+  .dial-caption{margin-top:18px;text-align:center;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-soft);max-width:300px;letter-spacing:0.02em;}
+  .dial-caption b{color:var(--teal-deep);}
+  .spoke{stroke-linecap:round;transform-origin:200px 200px;}
+  .spoke-track{stroke:var(--line);stroke-width:10;}
+  .spoke-value{stroke-width:10;opacity:0;transform:scaleX(0.06);animation:growSpoke .9s cubic-bezier(.2,.8,.2,1) forwards;}
+  .spoke-teal{stroke:var(--teal);}
+  .spoke-marigold{stroke:var(--marigold);}
+  .spoke-rose{stroke:var(--rose);}
+  .hub-ring{fill:none;stroke:var(--line);}
+  .hub{fill:var(--ivory);stroke:var(--teal-deep);stroke-width:1.4;}
+  .hub-num{font-family:var(--font-display);font-weight:600;fill:var(--teal-deep);}
+  .hub-label{font-family:var(--font-mono);fill:var(--ink-soft);font-size:11px;letter-spacing:.08em;}
+
+  @keyframes growSpoke{
+    to{opacity:1;transform:scaleX(1);}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .spoke-value{animation:none;opacity:1;transform:scaleX(1);}
+  }
+
+  /* ---------- Empathy ---------- */
+  .empathy{background:var(--teal-deep);color:var(--ivory);padding:80px 0;}
+  .empathy .eyebrow{color:var(--marigold);}
+  .empathy .eyebrow::before{background:var(--marigold);}
+  .empathy h2{color:var(--ivory);font-size:clamp(24px,2.6vw,32px);max-width:26ch;margin-bottom:44px;}
+  .empathy-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;}
+  .empathy-card{
+    border-top:1px solid rgba(247,242,230,0.25);
+    padding-top:22px;
+  }
+  .empathy-card p{font-family:var(--font-display);font-style:italic;font-size:19px;line-height:1.5;color:var(--sand);margin:0;}
+
+  /* ---------- Section shell ---------- */
+  section{padding:96px 0;}
+  .section-head{max-width:640px;margin-bottom:56px;}
+  .section-head h2{font-size:clamp(28px,3vw,38px);line-height:1.2;}
+  .section-head p{margin-top:16px;color:var(--ink-soft);font-size:16.5px;}
+
+  /* ---------- Pillars journey ---------- */
+  .pillars-path{display:flex;position:relative;gap:0;}
+  .pillars-path::before{
+    content:"";position:absolute;top:19px;left:19px;right:19px;height:1px;
+    background:repeating-linear-gradient(90deg, var(--ink-soft) 0 6px, transparent 6px 12px);
+    opacity:0.4;
+  }
+  .pillar{flex:1;display:flex;flex-direction:column;align-items:flex-start;padding-right:20px;position:relative;}
+  .pillar-dot{
+    width:39px;height:39px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-mono);font-size:13px;color:var(--ivory);
+    margin-bottom:22px;position:relative;z-index:2;
+    border:4px solid var(--ivory);
+  }
+  .pillar:nth-child(1) .pillar-dot{background:var(--teal);}
+  .pillar:nth-child(2) .pillar-dot{background:var(--marigold-dim);}
+  .pillar:nth-child(3) .pillar-dot{background:var(--rose);}
+  .pillar:nth-child(4) .pillar-dot{background:var(--teal);}
+  .pillar:nth-child(5) .pillar-dot{background:var(--marigold-dim);}
+  .pillar:nth-child(6) .pillar-dot{background:var(--rose);}
+  .pillar h3{font-size:19px;margin-bottom:10px;}
+  .pillar p{margin:0;font-size:14.5px;color:var(--ink-soft);}
+
+  /* ---------- Wellbeing legend ---------- */
+  .wellbeing{background:var(--sand);}
+  .wellbeing-layout{display:grid;grid-template-columns:0.9fr 1.1fr;gap:64px;align-items:start;}
+  .legend{display:grid;grid-template-columns:1fr 1fr;gap:20px 32px;}
+  .legend-item{display:flex;gap:14px;border-bottom:1px solid var(--line);padding-bottom:16px;}
+  .legend-dot{width:10px;height:10px;border-radius:50%;margin-top:6px;flex:none;}
+  .legend-item.c-teal .legend-dot{background:var(--teal);}
+  .legend-item.c-marigold .legend-dot{background:var(--marigold-dim);}
+  .legend-item.c-rose .legend-dot{background:var(--rose);}
+  .legend-title{display:flex;justify-content:space-between;align-items:baseline;font-weight:600;font-size:15px;color:var(--teal-deep);}
+  .legend-title span{font-family:var(--font-mono);font-size:13px;font-weight:500;color:var(--ink-soft);}
+  .legend-item p{margin:5px 0 0;font-size:13.5px;color:var(--ink-soft);}
+  .wellbeing-copy p{color:var(--ink-soft);}
+  .wellbeing-copy .section-head{margin-bottom:28px;}
+
+  /* ---------- Ecosystem ---------- */
+  .eco-groups{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;}
+  .eco-group{background:var(--ivory);border:1px solid var(--line);border-radius:18px;padding:28px 26px;}
+  .eco-group h3{font-size:16px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.06em;font-weight:500;color:var(--marigold-dim);margin-bottom:18px;}
+  .eco-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;}
+  .eco-list li{font-family:var(--font-display);font-size:17px;color:var(--teal-deep);padding-bottom:12px;border-bottom:1px solid var(--line);}
+  .eco-list li:last-child{border-bottom:none;padding-bottom:0;}
+
+  /* ---------- Audiences ---------- */
+  .audiences-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;}
+  .aud-card{border-radius:22px;padding:44px 38px;position:relative;overflow:hidden;}
+  .aud-card.families{background:var(--teal-deep);color:var(--ivory);}
+  .aud-card.providers{background:var(--ivory);border:1px solid var(--line);color:var(--ink);}
+  .aud-card .eyebrow{margin-bottom:22px;}
+  .aud-card.families .eyebrow{color:var(--marigold);}
+  .aud-card.families .eyebrow::before{background:var(--marigold);}
+  .aud-card.providers .eyebrow{color:var(--marigold-dim);}
+  .aud-card.providers .eyebrow::before{background:var(--marigold-dim);}
+  .aud-card h3{font-size:26px;margin-bottom:14px;}
+  .aud-card.families h3{color:var(--ivory);}
+  .aud-card p{font-size:15.5px;margin:0 0 28px;max-width:42ch;}
+  .aud-card.families p{color:var(--sand);}
+  .aud-card.providers p{color:var(--ink-soft);}
+
+  /* ---------- Testimonial ---------- */
+  .testimonial{text-align:center;}
+  .testimonial blockquote{
+    font-family:var(--font-display);font-style:italic;
+    font-size:clamp(22px,3vw,30px);line-height:1.5;max-width:820px;
+    margin:0 auto 26px;color:var(--teal-deep);
+  }
+  .testimonial cite{font-family:var(--font-mono);font-style:normal;font-size:13px;color:var(--ink-soft);letter-spacing:.03em;}
+
+  /* ---------- Final CTA ---------- */
+  .final-cta{background:var(--marigold);text-align:center;padding:100px 0;}
+  .final-cta h2{font-size:clamp(30px,4vw,44px);color:var(--teal-deep);max-width:18ch;margin:0 auto 34px;}
+  .final-cta .btn-primary{background:var(--teal-deep);color:var(--ivory);}
+  .final-cta .btn-primary:hover{background:var(--teal);box-shadow:0 6px 18px rgba(14,41,38,0.35);}
+
+  /* ---------- Footer ---------- */
+  footer{background:var(--teal-deep);color:var(--sand);padding:64px 0 32px;}
+  .footer-top{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;padding-bottom:48px;border-bottom:1px solid rgba(247,242,230,0.15);}
+  .footer-brand .brand{color:var(--ivory);margin-bottom:14px;}
+  .footer-brand p{font-size:14px;color:rgba(234,223,200,0.7);max-width:32ch;}
+  .footer-col h4{font-family:var(--font-mono);font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--marigold);margin:0 0 16px;font-weight:500;}
+  .footer-col ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:11px;}
+  .footer-col a{font-size:14px;color:rgba(247,242,230,0.85);}
+  .footer-col a:hover{color:var(--marigold);}
+  .footer-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:24px;font-size:12.5px;color:rgba(234,223,200,0.55);flex-wrap:wrap;gap:10px;}
+
+  /* ---------- Reveal on scroll ---------- */
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease, transform .7s ease;}
+  .reveal.is-visible{opacity:1;transform:translateY(0);}
+  @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none;}}
+
+  /* ---------- Responsive ---------- */
+  @media (max-width:980px){
+    .hero .wrap{grid-template-columns:1fr;}
+    .dial-wrap{order:-1;margin-bottom:10px;}
+    .empathy-grid{grid-template-columns:1fr;gap:32px;}
+    .pillars-path{flex-direction:column;gap:36px;}
+    .pillars-path::before{display:none;}
+    .wellbeing-layout{grid-template-columns:1fr;}
+    .legend{grid-template-columns:1fr;}
+    .eco-groups{grid-template-columns:1fr;}
+    .audiences-grid{grid-template-columns:1fr;}
+    .footer-top{grid-template-columns:1fr 1fr;}
+    .nav-links{display:none;}
+  }
+  @media (max-width:600px){
+    .wrap{padding:0 20px;}
+    .hero{padding:56px 0 64px;}
+    section{padding:64px 0;}
+    .footer-top{grid-template-columns:1fr;gap:32px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap">
+    <a href="#top" class="brand">
+      <svg viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="12" stroke="currentColor" stroke-width="1.3"/><path d="M13 3v6M13 17v6M3 13h6M17 13h6M6 6l4.2 4.2M15.8 15.8L20 20M20 6l-4.2 4.2M10.2 15.8L6 20" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/><circle cx="13" cy="13" r="3.4" fill="currentColor"/></svg>
+      Serve Saathi
+    </a>
+    <nav class="nav-links">
+      <a href="#pillars">How it works</a>
+      <a href="#wellbeing">The Wellbeing Score</a>
+      <a href="#ecosystem">Ecosystem</a>
+      <a href="#audiences">For Providers</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="#final-cta" class="btn btn-primary btn-sm">Start your assessment</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-copy">
+        <div class="eyebrow">A care operating system for ageing parents</div>
+        <h1>Someone should be watching over the people who <em>watched over you</em>.</h1>
+        <p class="hero-sub">Serve Saathi brings every part of your parents' care — doctors, caregivers, homes, finances, peace of mind — onto one trusted platform. Wherever you live, however far away.</p>
+        <div class="hero-ctas">
+          <a href="#final-cta" class="btn btn-primary">Start your family's assessment</a>
+          <a href="#pillars" class="btn btn-ghost">See how it works</a>
+        </div>
+        <div class="hero-meta">
+          <div><strong>13+</strong>verified provider categories</div>
+          <div><strong>9</strong>wellbeing dimensions tracked</div>
+          <div><strong>6</strong>pillars, one relationship</div>
+        </div>
+      </div>
+
+      <div class="dial-wrap">
+        <svg viewBox="0 0 400 400" width="100%" style="max-width:420px;">
+          <circle class="hub-ring" cx="200" cy="200" r="40"/>
+          <circle class="hub-ring" cx="200" cy="200" r="80"/>
+          <circle class="hub-ring" cx="200" cy="200" r="120"/>
+          <circle class="hub-ring" cx="200" cy="200" r="150"/>
+
+          <!-- tracks -->
+          <line class="spoke spoke-track" x1="200" y1="200" x2="200" y2="50"/>
+          <line class="spoke spoke-track" x1="200" y1="200" x2="296.4" y2="35.1"/>
+          <line class="spoke spoke-track" x1="200" y1="200" x2="347.7" y2="173.9"/>
+          <line class="spoke spoke-track" x1="200" y1="200" x2="329.9" y2="275"/>
+          <line class="spoke spoke-track" x1="200" y1="200" x2="251.3" y2="341"/>
+          <line class="spoke spoke-track" x1="200" y1="200" x2="148.7" y2="341"/>
+          <line class="spoke spoke-track" x1="200" y1="200" x2="70.1" y2="275"/>
+          <line class="spoke spoke-track" x1="200" y1="200" x2="52.3" y2="173.9"/>
+          <line class="spoke spoke-track" x1="200" y1="200" x2="103.6" y2="35.1"/>
+
+          <!-- value spokes -->
+          <line class="spoke spoke-value spoke-teal"     x1="200" y1="200" x2="200"    y2="74.2"  style="animation-delay:.05s"/>
+          <line class="spoke spoke-value spoke-marigold" x1="200" y1="200" x2="270.97" y2="115.41" style="animation-delay:.15s"/>
+          <line class="spoke spoke-value spoke-rose"     x1="200" y1="200" x2="328.22" y2="177.39" style="animation-delay:.25s"/>
+          <line class="spoke spoke-value spoke-teal"     x1="200" y1="200" x2="301.32" y2="258.5"  style="animation-delay:.35s"/>
+          <line class="spoke spoke-value spoke-marigold" x1="200" y1="200" x2="246.79" y2="328.55" style="animation-delay:.45s"/>
+          <line class="spoke spoke-value spoke-rose"     x1="200" y1="200" x2="165.63" y2="294.44" style="animation-delay:.55s"/>
+          <line class="spoke spoke-value spoke-teal"     x1="200" y1="200" x2="78.67"  y2="270.05" style="animation-delay:.65s"/>
+          <line class="spoke spoke-value spoke-marigold" x1="200" y1="200" x2="95.61"  y2="181.6"  style="animation-delay:.75s"/>
+          <line class="spoke spoke-value spoke-rose"     x1="200" y1="200" x2="142.47" y2="131.44" style="animation-delay:.85s"/>
+
+          <circle class="hub" cx="200" cy="200" r="38"/>
+          <text x="200" y="196" text-anchor="middle" class="hub-num" font-size="34">76</text>
+          <text x="200" y="216" text-anchor="middle" class="hub-label">WELLBEING</text>
+        </svg>
+        <p class="dial-caption"><b>The Elder Wellbeing Score</b> — one number, nine dimensions, updated as life changes.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- EMPATHY -->
+  <section class="empathy">
+    <div class="wrap">
+      <div class="eyebrow">This is what ageing looks like today</div>
+      <h2 class="reveal">Most families aren't short on love. They're short on visibility.</h2>
+      <div class="empathy-grid">
+        <div class="empathy-card reveal"><p>"1,400 kilometres away, and still the one who remembers her medication."</p></div>
+        <div class="empathy-card reveal"><p>"Three siblings, one WhatsApp group, and no idea who's actually looking after Dad this week."</p></div>
+        <div class="empathy-card reveal"><p>"A fall no one saw coming — because no one was watching."</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PILLARS -->
+  <section id="pillars">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="eyebrow">The journey, not just the booking</div>
+        <h2>Six pillars. One continuous relationship.</h2>
+        <p>Ageing isn't a single purchase — it's an unfolding story. Serve Saathi is built to stay with your family through every chapter of it.</p>
+      </div>
+      <div class="pillars-path">
+        <div class="pillar reveal"><div class="pillar-dot">1</div><h3>Discover</h3><p>Find verified doctors, caregivers, homes and services near your parents — vetted before they ever reach your family.</p></div>
+        <div class="pillar reveal"><div class="pillar-dot">2</div><h3>Assess</h3><p>Understand where your parents truly stand today, across health, safety, money and mind.</p></div>
+        <div class="pillar reveal"><div class="pillar-dot">3</div><h3>Plan</h3><p>Turn that understanding into a personalised care plan you can actually act on.</p></div>
+        <div class="pillar reveal"><div class="pillar-dot">4</div><h3>Coordinate</h3><p>Bring every provider, sibling and appointment into one shared view.</p></div>
+        <div class="pillar reveal"><div class="pillar-dot">5</div><h3>Monitor</h3><p>Watch wellbeing evolve over time, and catch small changes before they become emergencies.</p></div>
+        <div class="pillar reveal"><div class="pillar-dot">6</div><h3>Thrive</h3><p>Help your parents live independently and engaged — not just cared for, but thriving.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WELLBEING SCORE -->
+  <section id="wellbeing" class="wellbeing">
+    <div class="wrap wellbeing-layout">
+      <div class="wellbeing-copy reveal">
+        <div class="section-head">
+          <div class="eyebrow">The Elder Wellbeing Score</div>
+          <h2>Nine dimensions. One clear picture.</h2>
+          <p>Most families only find out something is wrong in a crisis. The Elder Wellbeing Score changes that — a proprietary assessment retaken over time, so it becomes an early warning system, not a one-off checklist. Every score feeds directly into your parents' personalised care plan.</p>
+        </div>
+        <a href="#final-cta" class="btn btn-ghost">Take the assessment</a>
+      </div>
+      <div class="legend reveal">
+        <div class="legend-item c-teal"><span class="legend-dot"></span><div><div class="legend-title">Physical Health<span>78</span></div><p>Chronic conditions, medication, energy levels</p></div></div>
+        <div class="legend-item c-marigold"><span class="legend-dot"></span><div><div class="legend-title">Mobility<span>64</span></div><p>Balance, fall risk, ease of movement</p></div></div>
+        <div class="legend-item c-rose"><span class="legend-dot"></span><div><div class="legend-title">Emotional Wellbeing<span>82</span></div><p>Mood, loneliness, sense of purpose</p></div></div>
+        <div class="legend-item c-teal"><span class="legend-dot"></span><div><div class="legend-title">Nutrition<span>70</span></div><p>Diet quality, hydration, appetite</p></div></div>
+        <div class="legend-item c-marigold"><span class="legend-dot"></span><div><div class="legend-title">Safety<span>88</span></div><p>Home hazards, emergency readiness</p></div></div>
+        <div class="legend-item c-rose"><span class="legend-dot"></span><div><div class="legend-title">Social Engagement<span>55</span></div><p>Friendships, family contact, community</p></div></div>
+        <div class="legend-item c-teal"><span class="legend-dot"></span><div><div class="legend-title">Financial Prep.<span>91</span></div><p>Savings, insurance, ongoing costs</p></div></div>
+        <div class="legend-item c-marigold"><span class="legend-dot"></span><div><div class="legend-title">Legal Readiness<span>60</span></div><p>Will, power of attorney, documentation</p></div></div>
+        <div class="legend-item c-rose"><span class="legend-dot"></span><div><div class="legend-title">Digital Inclusion<span>45</span></div><p>Comfort with phones, video calls, apps</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ECOSYSTEM -->
+  <section id="ecosystem">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="eyebrow">The ecosystem</div>
+        <h2>Every provider your parents will ever need, already verified.</h2>
+        <p>No more cold-calling numbers from a WhatsApp forward. Every provider on Serve Saathi is vetted, rated and connected to your family's care plan.</p>
+      </div>
+      <div class="eco-groups">
+        <div class="eco-group reveal">
+          <h3>Care &amp; Living</h3>
+          <ul class="eco-list">
+            <li>Assisted Living Communities</li>
+            <li>Old Age Homes</li>
+            <li>Home Nursing Agencies</li>
+            <li>Caregivers</li>
+          </ul>
+        </div>
+        <div class="eco-group reveal">
+          <h3>Health &amp; Medical</h3>
+          <ul class="eco-list">
+            <li>Hospitals</li>
+            <li>Doctors</li>
+            <li>Diagnostic Centres</li>
+            <li>Physiotherapists</li>
+            <li>Pharmacies</li>
+            <li>Rehabilitation Centres</li>
+          </ul>
+        </div>
+        <div class="eco-group reveal">
+          <h3>Life &amp; Logistics</h3>
+          <ul class="eco-list">
+            <li>Legal Advisors</li>
+            <li>Financial Planners</li>
+            <li>Transportation Providers</li>
+            <li>Daily Living Services</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AUDIENCES -->
+  <section id="audiences">
+    <div class="wrap">
+      <div class="audiences-grid">
+        <div class="aud-card families reveal">
+          <div class="eyebrow">For families</div>
+          <h3>Care from wherever you are.</h3>
+          <p>Whether your parents live down the street or across the world, manage their care from one place — with your siblings, on the same page.</p>
+          <a href="#final-cta" class="btn btn-on-dark btn-sm">Start your assessment</a>
+        </div>
+        <div class="aud-card providers reveal">
+          <div class="eyebrow">For verified providers</div>
+          <h3>Grow your practice, with structure.</h3>
+          <p>Reach families who are actively looking, manage bookings and care coordination, and grow through technology built for elder care.</p>
+          <a href="#final-cta" class="btn btn-ghost btn-sm">Join as a provider</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIAL -->
+  <section class="testimonial">
+    <div class="wrap">
+      <blockquote class="reveal">"For the first time since Dad's diagnosis, I don't feel like I'm guessing. I can see his appointments, his caregiver's notes, even how he's doing emotionally — from my apartment, half a world away."</blockquote>
+      <cite>A Serve Saathi family member · Toronto &amp; Lucknow</cite>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section id="final-cta" class="final-cta">
+    <div class="wrap">
+      <h2 class="reveal">Your parents took care of everything, once. Let's take care of what comes next, together.</h2>
+      <a href="#" class="btn btn-primary">Begin your family's care plan</a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="#top" class="brand">
+          <svg viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="12" stroke="currentColor" stroke-width="1.3"/><path d="M13 3v6M13 17v6M3 13h6M17 13h6M6 6l4.2 4.2M15.8 15.8L20 20M20 6l-4.2 4.2M10.2 15.8L6 20" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/><circle cx="13" cy="13" r="3.4" fill="currentColor"/></svg>
+          Serve Saathi
+        </a>
+        <p>Your family's companion in ageing — from the first assessment to every day after.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <ul>
+          <li><a href="#pillars">How it works</a></li>
+          <li><a href="#wellbeing">Wellbeing Score</a></li>
+          <li><a href="#ecosystem">Ecosystem</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">For Providers</a></li>
+          <li><a href="#">Careers</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Privacy</a></li>
+          <li><a href="#">Terms</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Serve Saathi. All rights reserved.</span>
+      <span>Made with care, in India.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){ e.target.classList.add('is-visible'); io.unobserve(e.target); }
+    });
+  }, {threshold:0.15});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+
+</body>
+</html>
