@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Serve Saathi — My Care Dashboard (Top Nav + Sidebar, Unified)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#173B2C;
+    --green-dark:#0F2A1F;
+    --green-mid:#1F4A38;
+    --mint:#EAF2E8;
+    --white:#FFFFFF;
+    --orange:#E8834A;
+    --orange-tint:#FBE4CC;
+    --orange-text:#B96A1E;
+    --red:#D9534F;
+    --ink:#1F2A22;
+    --muted:#6E7C71;
+    --border:#E0E8DE;
+    --font-display:'Poppins', sans-serif;
+    --font-body:'Inter', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; font-family:var(--font-body); background:var(--mint); color:var(--ink);}
+  h1,h2,h3,h4{font-family:var(--font-display); margin:0;}
+  a{color:inherit; text-decoration:none;}
+  :focus-visible{outline:2px solid var(--orange); outline-offset:2px;}
+
+  .skip-link{position:absolute; left:-999px; top:0; background:var(--white); color:var(--green); padding:10px 16px; font-weight:600; z-index:1000; border-radius:0 0 8px 0;}
+  .skip-link:focus{left:0;}
+
+  /* ===== TOP BAR (global — spans full width, always visible) ===== */
+  .topbar{background:var(--green); padding:0 24px; position:sticky; top:0; z-index:50;}
+  .topbar-row{display:flex; align-items:center; height:64px;}
+  .logo{display:flex; align-items:center; gap:8px; font-family:var(--font-display); font-weight:700; font-size:19px; color:#fff; margin-right:34px; flex-shrink:0;}
+  .logo .mark{width:28px;height:28px;}
+  .topsections{display:flex; flex:1; height:100%;}
+  .topsections button{background:none; border:none; height:100%; padding:0 20px; color:rgba(255,255,255,.72); font-family:var(--font-body); font-weight:600; font-size:14px; cursor:pointer; border-bottom:3px solid transparent; display:flex; align-items:center;}
+  .topsections button:hover{color:#fff;}
+  .topsections button[aria-current="true"]{color:#fff; border-bottom-color:var(--orange);}
+  .topicons{display:flex; align-items:center; flex-shrink:0;}
+  .iconbtn{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;color:#fff;position:relative; cursor:pointer; flex-shrink:0; border:none; margin-right:10px;}
+  .iconbtn .dot{position:absolute; top:6px; right:7px; width:8px; height:8px; border-radius:50%; background:var(--orange); border:1.5px solid var(--green);}
+  .helpline{display:flex; align-items:center; background:var(--red); color:#fff; padding:9px 16px; border-radius:8px; font-weight:600; font-size:13.5px; flex-shrink:0; margin-right:10px; border:none; cursor:pointer;}
+  .helpline .hicon{margin-right:6px;}
+  .avatar-chip{display:flex; align-items:center; background:rgba(255,255,255,.12); padding:5px 12px 5px 5px; border-radius:20px; cursor:pointer; flex-shrink:0; border:none;}
+  .avatar-chip .av{width:30px;height:30px;border-radius:50%; background:#fff; color:var(--green); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; margin-right:9px;}
+  .avatar-chip .atext{text-align:left;}
+  .avatar-chip .an{color:#fff; font-size:13px; font-weight:600; line-height:1.15; display:block;}
+  .avatar-chip .as{color:var(--orange-tint); font-size:10.5px;}
+
+  /* ===== BODY: sidebar + main, side by side, both always visible ===== */
+  .body-shell{display:flex; align-items:flex-start;}
+
+  .sidebar{width:264px; flex-shrink:0; background:var(--green-mid); min-height:calc(100vh - 64px); padding:20px 14px; position:sticky; top:64px;}
+  .sb-section-label{color:rgba(255,255,255,.5); font-size:11px; font-weight:700; letter-spacing:.04em; padding:6px 10px 10px 10px;}
+  .sb-link{display:flex; align-items:center; justify-content:space-between; width:100%; background:none; border:none; text-align:left; padding:11px 10px; border-radius:8px; color:rgba(255,255,255,.8); font-family:var(--font-body); font-size:13.5px; font-weight:600; cursor:pointer; margin-bottom:2px;}
+  .sb-link:hover{background:rgba(255,255,255,.06); color:#fff;}
+  .sb-link[aria-current="true"]{background:rgba(255,255,255,.14); color:#fff;}
+  .sb-link .chev{font-size:10px; opacity:.7; transition:.15s;}
+  .sb-link.open .chev{transform:rotate(90deg);}
+  .sb-nested{max-height:0; overflow:hidden; transition:max-height .2s ease;}
+  .sb-nested.open{max-height:300px;}
+  .sb-nested button{display:block; width:100%; text-align:left; background:none; border:none; padding:8px 10px 8px 30px; font-size:12.5px; color:rgba(255,255,255,.6); border-radius:6px; cursor:pointer; font-family:var(--font-body);}
+  .sb-nested button:hover{color:#fff;}
+  .sb-nested button[aria-current="true"]{color:#fff; font-weight:600; background:rgba(255,255,255,.08);}
+  .sb-divider{height:1px; background:rgba(255,255,255,.12); margin:14px 4px;}
+  .sb-bottom{margin-top:20px;}
+  .sb-user{display:flex; align-items:center; padding:10px; border-top:1px solid rgba(255,255,255,.12); margin-top:12px;}
+  .sb-user .av{width:34px;height:34px;border-radius:50%; background:rgba(255,255,255,.15); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12.5px; margin-right:10px;}
+  .sb-user b{color:#fff; font-size:12.5px; display:block;}
+  .sb-user span{color:rgba(255,255,255,.55); font-size:11px;}
+  .sb-logout{display:flex; align-items:center; gap:8px; color:rgba(255,255,255,.7); font-size:12.5px; padding:10px; cursor:pointer; background:none; border:none; width:100%; text-align:left; font-family:var(--font-body);}
+
+  .main{flex:1; padding:28px 32px 60px 32px; min-width:0;}
+  .greet-date{color:var(--green); font-weight:600; font-size:13px; margin-bottom:6px;}
+  .greet-h{font-size:26px; color:var(--ink); margin-bottom:4px;}
+  .greet-sub{color:var(--muted); font-size:14px;}
+
+  .card{background:var(--white); border-radius:14px; padding:20px; box-shadow:0 1px 2px rgba(0,0,0,.04), 0 4px 14px rgba(0,0,0,.04);}
+  .btn{border-radius:9px; padding:11px 18px; font-family:var(--font-body); font-weight:600; font-size:13.5px; border:1px solid transparent; cursor:pointer;}
+  .btn-primary{background:var(--green); color:#fff;}
+  .btn-outline{background:var(--mint); color:var(--green); border-color:var(--border);}
+
+  .badge{display:inline-block; padding:3px 11px; border-radius:20px; font-size:11px; font-weight:700; background:var(--orange-tint); color:var(--orange-text);}
+
+  .gauge{width:90px; height:90px; border-radius:50%; background:conic-gradient(var(--green) 0% 55%, var(--orange) 55% 68%, var(--orange-tint) 68% 100%); display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .gauge .inner{width:66px;height:66px;border-radius:50%;background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center;}
+  .gauge .inner b{font-family:var(--font-display); font-size:16px; color:var(--ink);}
+  .gauge .inner span{font-size:8px; color:var(--muted);}
+
+  .progressbar{height:8px; border-radius:5px; background:var(--mint); overflow:hidden; margin:10px 0 8px 0;}
+  .progressbar .fill{height:100%; width:11%; background:linear-gradient(90deg, var(--green), var(--orange));}
+
+  .taskcard{background:#fff; border-left:3px solid var(--orange); border-radius:10px; padding:12px 14px; margin-bottom:10px; box-shadow:0 1px 2px rgba(0,0,0,.04);}
+  .taskcard .trow{display:flex; align-items:flex-start; justify-content:space-between;}
+  .taskcard .tcheck{width:18px;height:18px;border:1.5px solid var(--border); border-radius:5px; flex-shrink:0; margin-top:2px; margin-left:8px;}
+  .taskcard h4{font-size:13.5px; margin-bottom:3px;}
+  .taskcard p{font-size:12px; color:var(--muted); margin:0;}
+
+  .listcard{background:#fff; border-left:3px solid var(--green); border-radius:10px; padding:12px 14px; margin-bottom:10px; box-shadow:0 1px 2px rgba(0,0,0,.04); display:flex; align-items:center;}
+  .listcard .lic{width:34px;height:34px;border-radius:8px; background:var(--mint); color:var(--green); display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-right:10px;}
+  .listcard b{font-size:13px; display:block;}
+  .listcard span{font-size:11.5px; color:var(--muted);}
+
+  .col-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;}
+  .col-head h3{font-size:15px;}
+  .col-head a{font-size:12.5px; color:var(--green); font-weight:600;}
+
+  .top-row{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:22px;}
+  .cards-row{display:flex; margin-bottom:26px;}
+  .cards-row > *{margin-right:20px;}
+  .cards-row > *:last-child{margin-right:0;}
+  .three-col{display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px;}
+
+  .page-stub{max-width:640px;}
+  .page-stub .card{margin-top:16px;}
+  .page-stub p{color:var(--muted); font-size:14px; line-height:1.6;}
+
+  .view-panel{display:none;}
+  .view-panel.active{display:block;}
+
+  @media (max-width: 900px){
+    .sidebar{position:fixed; left:-280px; top:64px; height:calc(100vh - 64px); z-index:40; transition:left .2s ease; box-shadow:4px 0 18px rgba(0,0,0,.15);}
+    .sidebar.mobile-open{left:0;}
+    .three-col{grid-template-columns:1fr;}
+    .cards-row{flex-direction:column;}
+    .cards-row > *{margin-right:0; margin-bottom:16px;}
+    .topsections{overflow-x:auto;}
+  }
+</style>
+</head>
+<body>
+
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<header class="topbar" role="banner">
+  <div class="topbar-row">
+    <a href="#" class="logo"><svg class="mark" viewBox="0 0 26 26" fill="none"><circle cx="13" cy="13" r="12" stroke="#fff" stroke-width="1.3"/><circle cx="13" cy="13" r="3.4" fill="#fff"/></svg>Serve Saathi</a>
+
+    <nav class="topsections" aria-label="Primary">
+      <button aria-current="true" data-section="mycare" onclick="setSection('mycare')">My Care</button>
+      <button data-section="findcare" onclick="setSection('findcare')">Find Care</button>
+      <button data-section="community" onclick="setSection('community')">Community &amp; Resources</button>
+      <button data-section="account" onclick="setSection('account')">Account</button>
+    </nav>
+
+    <div class="topicons">
+      <button class="iconbtn" aria-label="Search">🔍</button>
+      <button class="iconbtn" aria-label="Notifications, 1 unread">🔔<span class="dot"></span></button>
+      <button class="helpline"><span class="hicon">♥</span> Helpline</button>
+      <button class="avatar-chip" aria-label="Account menu for Kamala Sharma"><span class="av">KS</span><span class="atext"><span class="an">Kamala Sharma</span><span class="as">Yourself</span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="body-shell">
+
+  <!-- ===== SIDEBAR — content changes based on which top-bar section is active ===== -->
+  <nav class="sidebar" aria-label="Section">
+
+    <!-- My Care sidebar -->
+    <div id="sb-mycare" class="sb-group">
+      <div class="sb-section-label">MY CARE</div>
+      <button class="sb-link" aria-current="true" onclick="setPage('mycare','overview',this)">Overview</button>
+      <button class="sb-link" onclick="setPage('mycare','wellbeing',this)">Elder Wellbeing</button>
+      <button class="sb-link" onclick="setPage('mycare','careplan',this)">Care Plan</button>
+      <button class="sb-link" onclick="setPage('mycare','history',this)">Service History</button>
+      <button class="sb-link" onclick="setPage('mycare','family',this)">Family &amp; Elder</button>
+      <button class="sb-link" onclick="setPage('mycare','payments',this)">Payments</button>
+    </div>
+
+    <!-- Find Care sidebar -->
+    <div id="sb-findcare" class="sb-group" style="display:none;">
+      <div class="sb-section-label">FIND CARE</div>
+      <button class="sb-link" onclick="setPage('findcare','situations',this)">Life Situations</button>
+      <button class="sb-link" onclick="toggleNested(this)" aria-expanded="false">Browse All Services <span class="chev">▸</span></button>
+      <div class="sb-nested">
+        <button onclick="setPage('findcare','facilities',this)">Care Facilities</button>
+        <button onclick="setPage('findcare','services',this)">Care Services</button>
+        <button onclick="setPage('findcare','wellness',this)">Health &amp; Wellness</button>
+        <button onclick="setPage('findcare','legal',this)">Legal &amp; Financial</button>
+        <button onclick="setPage('findcare','daily',this)">Daily Living &amp; Lifestyle</button>
+        <button onclick="setPage('findcare','famsupport',this)">Family Support</button>
+      </div>
+    </div>
+
+    <!-- Community & Resources sidebar -->
+    <div id="sb-community" class="sb-group" style="display:none;">
+      <div class="sb-section-label">COMMUNITY &amp; RESOURCES</div>
+      <button class="sb-link" onclick="setPage('community','learn',this)">Learn</button>
+      <button class="sb-link" onclick="setPage('community','connect',this)">Connect</button>
+      <button class="sb-link" onclick="setPage('community','events',this)">Events</button>
+    </div>
+
+    <!-- Account sidebar -->
+    <div id="sb-account" class="sb-group" style="display:none;">
+      <div class="sb-section-label">ACCOUNT</div>
+      <button class="sb-link" onclick="setPage('account','profile',this)">Profile</button>
+      <button class="sb-link" onclick="setPage('account','settings',this)">Settings</button>
+    </div>
+
+    <div class="sb-bottom">
+      <div class="sb-divider"></div>
+      <div class="sb-user">
+        <span class="av">KS</span>
+        <div><b>Kamala Sharma</b><span>Yourself</span></div>
+      </div>
+      <button class="sb-logout">↩ Log out</button>
+    </div>
+  </nav>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="main" id="main-content">
+
+    <!-- My Care > Overview (the fully designed dashboard) -->
+    <div class="view-panel active" id="page-mycare-overview">
+      <div class="top-row">
+        <div>
+          <div class="greet-date">Wednesday, 04 September 2026</div>
+          <h1 class="greet-h">Good evening Kamala,</h1>
+          <div class="greet-sub">Here's how your care is looking today.</div>
+        </div>
+      </div>
+
+      <div class="cards-row">
+        <div class="card" style="flex:1; display:flex; align-items:center;">
+          <div class="gauge" style="margin-right:18px;"><div class="inner"><b>68</b><span>OUT OF 100</span></div></div>
+          <div>
+            <h3 style="font-size:16px; margin-bottom:4px;">Looking steady</h3>
+            <p style="font-size:12.5px; color:var(--muted); margin:0 0 12px 0;">Your care signals are in a good place. Keep the rhythm going.</p>
+            <div style="display:flex;">
+              <div class="btn btn-outline" style="margin-right:8px;">View Care Plan</div>
+              <div class="btn btn-primary">Retake Assessment</div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="width:320px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+              <h4 style="font-size:13px; color:var(--muted); font-weight:600;">Today's Progress</h4>
+              <div style="font-family:var(--font-display); font-size:22px; margin:4px 0;">1 of 9 tasks</div>
+            </div>
+            <div class="iconbtn" style="background:var(--green); position:static;">📅</div>
+          </div>
+          <div class="progressbar"><div class="fill"></div></div>
+          <p style="font-size:12px; color:var(--muted); margin:0;">A little progress goes a long way.</p>
+        </div>
+      </div>
+
+      <div class="three-col">
+        <div>
+          <div class="col-head"><h3>Today's Care Tasks</h3><a href="#">View All →</a></div>
+          <div class="taskcard"><div class="trow"><div><h4>Seated strength routine</h4><p>15 minutes of the physiotherapist-prescribed chair set.</p></div><div class="tcheck"></div></div><span class="badge" style="margin-top:8px; display:inline-block;">Afternoon</span></div>
+          <div class="taskcard"><div class="trow"><div><h4>Memory exercise block</h4><p>20 minutes: recall sequence, word list, newspaper summary aloud.</p></div><div class="tcheck"></div></div><span class="badge" style="margin-top:8px; display:inline-block;">Morning</span></div>
+          <div class="taskcard"><div class="trow"><div><h4>BP dose reminder</h4><p>Set up for today</p></div><div class="tcheck"></div></div><span class="badge" style="margin-top:8px; display:inline-block;">Morning</span></div>
+        </div>
+        <div>
+          <div class="col-head"><h3>Track Requests</h3><a href="#">View All →</a></div>
+          <div class="listcard"><div class="lic">🧑‍⚕️</div><div><b>Caregiver — HelpAge India</b><span>Requested 2 hrs ago</span></div><span class="badge" style="margin-left:auto;">In Progress</span></div>
+        </div>
+        <div>
+          <div class="col-head"><h3>Bookings</h3><a href="#">View All →</a></div>
+          <div class="listcard"><div class="lic">🧘</div><div><b>Yoga &amp; Wellness — Zoom</b><span>23 April · 9:00 AM</span></div></div>
+          <div class="btn btn-primary" style="text-align:center; margin-top:4px;">Social Events</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Simple stub panels for every other sidebar destination — nav architecture demo, not full page designs -->
+    <div class="view-panel page-stub" id="page-mycare-wellbeing"><h1 class="greet-h">Elder Wellbeing</h1><div class="card"><p>Your composite Wellbeing Score, the 9-dimension breakdown, trend over time, and a link into your Care Plan live here.</p></div></div>
+    <div class="view-panel page-stub" id="page-mycare-careplan"><h1 class="greet-h">Care Plan</h1><div class="card"><p>Addable/removable care modules — medication, visits, documents — built from your Wellbeing assessment.</p></div></div>
+    <div class="view-panel page-stub" id="page-mycare-history"><h1 class="greet-h">Service History</h1><div class="card"><p>Active &amp; upcoming bookings, plus full booking history, with status for each.</p></div></div>
+    <div class="view-panel page-stub" id="page-mycare-family"><h1 class="greet-h">Family &amp; Elder</h1><div class="card"><p>Elders under your care, family member permissions, and invites.</p></div></div>
+    <div class="view-panel page-stub" id="page-mycare-payments"><h1 class="greet-h">Payments</h1><div class="card"><p>Invoices and payment history for bookings and subscriptions.</p></div></div>
+
+    <div class="view-panel page-stub" id="page-findcare-situations"><h1 class="greet-h">Life Situations</h1><div class="card"><p>Something Just Happened, Living Alone &amp; Worried, Memory &amp; Cognitive Changes, Planning Ahead, Need a Break, and Concierge — curated entry points into the right services.</p></div></div>
+    <div class="view-panel page-stub" id="page-findcare-facilities"><h1 class="greet-h">Care Facilities</h1><div class="card"><p>Assisted Living, Old Age Homes, Nursing Homes, Retirement Communities, Hospitals, Diagnostic Centres, and more — with the filters we built for each.</p></div></div>
+    <div class="view-panel page-stub" id="page-findcare-services"><h1 class="greet-h">Care Services</h1><div class="card"><p>In-home caregiving, nursing visits, and companionship services.</p></div></div>
+    <div class="view-panel page-stub" id="page-findcare-wellness"><h1 class="greet-h">Health &amp; Wellness</h1><div class="card"><p>Physiotherapy, dietary support, and preventive wellness services.</p></div></div>
+    <div class="view-panel page-stub" id="page-findcare-legal"><h1 class="greet-h">Legal &amp; Financial</h1><div class="card"><p>Estate planning, legal aid, and financial advisory services for seniors.</p></div></div>
+    <div class="view-panel page-stub" id="page-findcare-daily"><h1 class="greet-h">Daily Living &amp; Lifestyle</h1><div class="card"><p>Meal delivery, housekeeping, transport, and everyday assistance.</p></div></div>
+    <div class="view-panel page-stub" id="page-findcare-famsupport"><h1 class="greet-h">Family Support</h1><div class="card"><p>Caregiver counselling and resources for the family, not just the senior.</p></div></div>
+
+    <div class="view-panel page-stub" id="page-community-learn"><h1 class="greet-h">Learn</h1><div class="card"><p>Articles, videos, guides, checklists, and FAQs on caregiving topics.</p></div></div>
+    <div class="view-panel page-stub" id="page-community-connect"><h1 class="greet-h">Connect</h1><div class="card"><p>Caregiver forums, support groups, and Expert Q&amp;A sessions.</p></div></div>
+    <div class="view-panel page-stub" id="page-community-events"><h1 class="greet-h">Events</h1><div class="card"><p>Workshops, webinars, and trips for seniors happening near you.</p></div></div>
+
+    <div class="view-panel page-stub" id="page-account-profile"><h1 class="greet-h">Profile</h1><div class="card"><p>Your personal details and the elders you manage.</p></div></div>
+    <div class="view-panel page-stub" id="page-account-settings"><h1 class="greet-h">Settings</h1><div class="card"><p>Privacy, accessibility, language, notification preferences, and help &amp; support.</p></div></div>
+
+  </main>
+</div>
+
+<script>
+  var sections = ['mycare','findcare','community','account'];
+  var defaultPage = {mycare:'overview', findcare:'situations', community:'learn', account:'profile'};
+
+  function setSection(section){
+    sections.forEach(function(s){
+      document.getElementById('sb-'+s).style.display = (s === section) ? 'block' : 'none';
+    });
+    document.querySelectorAll('.topsections button').forEach(function(b){
+      b.setAttribute('aria-current', b.getAttribute('data-section') === section ? 'true' : 'false');
+    });
+    // land on that section's first/default page
+    var group = document.getElementById('sb-'+section);
+    var firstLink = group.querySelector('.sb-link');
+    setPage(section, defaultPage[section], firstLink);
+  }
+
+  function setPage(section, page, triggerEl){
+    document.querySelectorAll('.view-panel').forEach(function(p){ p.classList.remove('active'); });
+    var target = document.getElementById('page-'+section+'-'+page);
+    if(target){ target.classList.add('active'); }
+    // update aria-current within the currently visible sidebar group only
+    var group = document.getElementById('sb-'+section);
+    group.querySelectorAll('.sb-link, .sb-nested button').forEach(function(b){ b.removeAttribute('aria-current'); });
+    if(triggerEl){ triggerEl.setAttribute('aria-current','true'); }
+    target && target.scrollIntoView({block:'start'});
+    window.scrollTo({top:0, behavior:'instant'});
+  }
+
+  function toggleNested(el){
+    var nested = el.nextElementSibling;
+    var isOpen = nested.classList.contains('open');
+    nested.classList.toggle('open', !isOpen);
+    el.classList.toggle('open', !isOpen);
+    el.setAttribute('aria-expanded', String(!isOpen));
+  }
+</script>
+</body>
+</html>
